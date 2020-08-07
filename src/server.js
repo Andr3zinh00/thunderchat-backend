@@ -21,15 +21,20 @@ mongoose.connection.on('error', err => {
 mongoose.connection.once('open', () => {
     console.log('MongoDB connected');
 });
+
 require('./models/User');
 require('./models/Chat');
 require('./models/Messages');
 
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({
+    extended: true
+}));
 app.use(cors());
+
 //setup routes
 app.use('/user', require('./routes/user'));
+app.use('/chat', require('./routes/chat'));
 
 //Error handlers
 app.use(errorHandler.mongoseErrors);
