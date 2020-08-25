@@ -3,30 +3,44 @@ const User = mongoose.model('User');
 const sha256 = require('js-sha256');
 const jwt = require('jsonwebtoken');
 
-exports.register = async (req, res) => {
-    const { name, email, password } = req.body;
+async function find(args) {
+    const exists = await User.findOne({ ...args });
 
-    const emailRegex = /@gmail.com|@yahoo.com|@hotmail.com|@live.com/;
+    return exists;
+}
+
+exports.register = async (req, res) => {
+    const { name, email, password, mention, age } = req.body;
+
+    console.log(mention)
+
+    const emailRegex = /@gmail.com|@yahoo.com|@outlook.com|@hotmail.com|@live.com/;
 
     if (!emailRegex.test(email)) throw "Este dominio de email não é suportado por nosso site!";
     if (password.length < 6) throw "A senha deve ter pelo menos 6 caracteres!";
 
-    const userExists = await User.findOne({
-        email,
-    });
+    const userExists = await find({email});
 
     if (userExists) throw "Um usuário com o mesmo email já existe!";
+
+    const ment = "@" + mention;
+
+    const mentionExists = await find({ mention: ment });
+
+    if (mentionExists) throw "Um usuário com a mesma @ já existe";
 
     const user = new User({
         name,
         email,
+        mention: ment,
+        age,
         password: sha256(password + process.env.SALT),
     });
 
     await user.save();
 
     res.json({
-        message: "User [" + name + "] registered successfully!",
+        message: "Usuário " + mention + " registrado com sucesso :D",
     });
 }
 
