@@ -4,7 +4,9 @@ const sha256 = require('js-sha256');
 const jwt = require('jsonwebtoken');
 
 async function find(args) {
-    const exists = await User.findOne({ ...args });
+    const obj = {...args}
+    console.log(obj);
+    const exists = User.findOne({ ...args });
 
     return exists;
 }
@@ -19,7 +21,7 @@ exports.register = async (req, res) => {
     if (!emailRegex.test(email)) throw "Este dominio de email não é suportado por nosso site!";
     if (password.length < 6) throw "A senha deve ter pelo menos 6 caracteres!";
 
-    const userExists = await find({email});
+    const userExists = await find({ email });
 
     if (userExists) throw "Um usuário com o mesmo email já existe!";
 
@@ -45,15 +47,36 @@ exports.register = async (req, res) => {
 }
 
 exports.login = async (req, res) => {
-    const { email, password } = req.body;
+    const { userId, password } = req.body;
 
-    const user = await User.findOne({ email, password: sha256(password + process.env.SALT) });
-    if (!user) throw "Email ou senha não são compativeis com nenhum registro!";
+    console.log(password)
+    
+    const userCredentials = userId[0] === "@" ?
+        { mention: userId }
+        :
+        { email: userId };
+
+    const returnedObject = Object.assign(userCredentials,
+        { password: sha256(password + process.env.SALT) });
+
+    console.log(returnedObject);
+
+    const user = await find(returnedObject);
+    if (!user) throw "Email/@ ou senha não são compativeis com nenhum registro!";
 
     const token = jwt.sign({ id: user.id }, process.env.SECRET);
 
+    console.log(user);
+
+    const sendBack = {
+        id:user.id,
+        name:user.name,
+        mention:user.mention,
+        age:user.age,
+    }
     res.json({
         message: "Usuário logado com sucesso",
+        ...sendBack,
         token
     });
 }
