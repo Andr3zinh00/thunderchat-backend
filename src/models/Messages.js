@@ -8,7 +8,7 @@ const messageSchema = new mongoose.Schema({
     },
     user:{
         type:mongoose.Schema.Types.ObjectId,
-        required:'Chat is Required!',
+        required:'user is Required!',
         ref:'User'
     },
     message:{
@@ -19,4 +19,4 @@ const messageSchema = new mongoose.Schema({
     timestamps:true
 });
 
-module.exports=mongoose.model('Message',messageSchema);
+module.exports=mongoose.model('Messages',messageSchema);

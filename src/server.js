@@ -25,6 +25,8 @@ mongoose.connection.once('open', () => {
 require('./models/User');
 require('./models/Chat');
 require('./models/Messages');
+require('./models/Notifications');
+require('./models/Contacts');
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -40,16 +42,40 @@ app.use('/chat', require('./routes/chat'));
 app.use(errorHandler.mongoseErrors);
 app.use(errorHandler.notFound);
 
-app.listen(8080, () => {
+const server = app.listen(8080, () => {
     console.log('server rodando na porta 8080')
 });
 
-// const io = require('socket.io')
+const io = require('socket.io')(server);
+
+const jwt = require("jsonwebtoken");
+
+
+// io.use(async (socket, next) => {
+//     try {
+//         const token = socket.handshake.query.token;
+//         const payload = jwt.verify(token, process.env.SECRET);
+//         socket.userId = payload.id;
+//         next();
+//     } catch (error) {
+//         console.log(error);
+//     }
+// });
+
+io.on('connection', (socket) => {
+    console.log('Client conectado: '+socket.id);
+    socket.on('chat', (data) => {
+        console.log(data)
+    });
+
+    socket.on('disconnect', () => {
+        console.log("Disconnected: " + socket.id)
+    });
+
+    socket.on('new_notification', (data) => {
+        console.log(data);
+        io.to(socket.id).emit({data})
+    });
+})
 
 //listerner
-// io.on('connection', (socket) => {
-//     console.log('Client conectado');
-//     socket.on('chat', (data) => {
-//         console.log(data)
-//     })
-// })

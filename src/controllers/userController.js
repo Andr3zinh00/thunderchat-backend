@@ -3,7 +3,7 @@ const User = mongoose.model('User');
 const sha256 = require('js-sha256');
 const jwt = require('jsonwebtoken');
 
-async function find(args) {
+function find(args) {
     const obj = {...args}
     console.log(obj);
     const exists = User.findOne({ ...args });
