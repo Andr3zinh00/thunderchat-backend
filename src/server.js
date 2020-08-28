@@ -27,6 +27,7 @@ require('./models/Chat');
 require('./models/Messages');
 require('./models/Notifications');
 require('./models/Contacts');
+require('./models/Connection');
 
 app.use(express.json());
 app.use(express.urlencoded({
@@ -62,19 +63,32 @@ const jwt = require("jsonwebtoken");
 //     }
 // });
 
+const { createConnection, deleteConnection } = require('./controllers/ConnectionController');
+
 io.on('connection', (socket) => {
-    console.log('Client conectado: '+socket.id);
+    console.log('Client conectado: ' + socket.id);
+
+
+    socket.on('connected', (data) => {
+        console.log(data, "ola");
+        console.log(socket.id);
+        createConnection(socket.id, data.mention);
+    })
+
     socket.on('chat', (data) => {
         console.log(data)
     });
 
     socket.on('disconnect', () => {
-        console.log("Disconnected: " + socket.id)
+        console.log("Disconnected: " + socket.id);
+
+        deleteConnection(socket.id);
+
     });
 
     socket.on('new_notification', (data) => {
         console.log(data);
-        io.to(socket.id).emit({data})
+        io.to(socket.id).emit({ data })
     });
 })
 

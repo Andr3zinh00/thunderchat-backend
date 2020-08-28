@@ -3,13 +3,14 @@ const User = mongoose.model('User');
 const sha256 = require('js-sha256');
 const jwt = require('jsonwebtoken');
 
-function find(args) {
-    const obj = {...args}
-    console.log(obj);
+const find = (args) => {
+    const obj = { ...args }
     const exists = User.findOne({ ...args });
 
     return exists;
 }
+
+exports.getUser = find;
 
 exports.register = async (req, res) => {
     const { name, email, password, mention, age } = req.body;
@@ -50,7 +51,7 @@ exports.login = async (req, res) => {
     const { userId, password } = req.body;
 
     console.log(password)
-    
+
     const userCredentials = userId[0] === "@" ?
         { mention: userId }
         :
@@ -69,10 +70,11 @@ exports.login = async (req, res) => {
     console.log(user);
 
     const sendBack = {
-        id:user.id,
-        name:user.name,
-        mention:user.mention,
-        age:user.age,
+        id: user.id,
+        name: user.name,
+        mention: user.mention,
+        age: user.age,
+        email:user.email,
     }
     res.json({
         message: "Usuário logado com sucesso",
