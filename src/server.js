@@ -86,6 +86,11 @@ io.on('connection', (socket) => {
 
     });
 
+    socket.on('request-contact', (data) => {
+        console.log("data: " + data);
+        socket.emit('add-contact', {message:"hihihihihihihhihi"})
+    });
+
     socket.on('new_notification', (data) => {
         console.log(data);
         io.to(socket.id).emit({ data })

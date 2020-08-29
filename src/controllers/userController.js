@@ -13,7 +13,7 @@ const find = (args) => {
 exports.getUser = find;
 
 exports.register = async (req, res) => {
-    const { name, email, password, mention, age } = req.body;
+    const { name, email, password, mention, date } = req.body;
 
     console.log(mention)
 
@@ -23,20 +23,17 @@ exports.register = async (req, res) => {
     if (password.length < 6) throw "A senha deve ter pelo menos 6 caracteres!";
 
     const userExists = await find({ email });
-
     if (userExists) throw "Um usuário com o mesmo email já existe!";
 
     const ment = "@" + mention;
-
     const mentionExists = await find({ mention: ment });
-
     if (mentionExists) throw "Um usuário com a mesma @ já existe";
 
     const user = new User({
         name,
         email,
         mention: ment,
-        age,
+        birth_date: date,
         password: sha256(password + process.env.SALT),
     });
 
@@ -74,7 +71,7 @@ exports.login = async (req, res) => {
         name: user.name,
         mention: user.mention,
         age: user.age,
-        email:user.email,
+        email: user.email,
     }
     res.json({
         message: "Usuário logado com sucesso",

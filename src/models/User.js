@@ -13,8 +13,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: 'Mention is required!'
     },
-    age: {
-        type: Number,
+    birth_date: {
+        type: Date,
         required: 'Date is required!'
     },
     password: {
