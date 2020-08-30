@@ -47,6 +47,7 @@ const server = app.listen(8080, () => {
     console.log('server rodando na porta 8080')
 });
 
+
 const io = require('socket.io')(server);
 
 const jwt = require("jsonwebtoken");
@@ -63,7 +64,8 @@ const jwt = require("jsonwebtoken");
 //     }
 // });
 
-const { createConnection, deleteConnection } = require('./controllers/ConnectionController');
+const { createConnection, deleteConnection } = require('./controllers/ConnectionSocketController');
+const { sendRequest } = require('./controllers/NotificationSocketController');
 
 io.on('connection', (socket) => {
     console.log('Client conectado: ' + socket.id);
@@ -83,12 +85,11 @@ io.on('connection', (socket) => {
         console.log("Disconnected: " + socket.id);
 
         deleteConnection(socket.id);
-
     });
 
-    socket.on('request-contact', (data) => {
-        console.log("data: " + data);
-        socket.emit('add-contact', {message:"hihihihihihihhihi"})
+    socket.on('request', (data) => {
+        sendRequest(data.mention, socket, data.message)
+        socket.emit('add-contact', { message: "hihihihihihihhihi" });
     });
 
     socket.on('new_notification', (data) => {

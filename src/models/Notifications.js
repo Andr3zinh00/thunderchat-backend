@@ -1,14 +1,17 @@
 const mongoose = require('mongoose');
 
 const notificationSchema = new mongoose.Schema({
-  user: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: 'User is Required!',
     ref: 'User'
   },
-  notifications_messages: [{ type: String }]
+  messages: {
+    type: [{ message: String, genre: String, sender: String }],
+    required: 'Messages are Required'
+  },
 }, {
   timestamps: true
 });
 
-module.exports = mongoose.model('Notifications', notificationSchema);
+module.exports = mongoose.model('notifications', notificationSchema);

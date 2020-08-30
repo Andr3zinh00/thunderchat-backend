@@ -2,15 +2,7 @@ const mongoose = require("mongoose");
 const User = mongoose.model('User');
 const sha256 = require('js-sha256');
 const jwt = require('jsonwebtoken');
-
-const find = (args) => {
-    const obj = { ...args }
-    const exists = User.findOne({ ...args });
-
-    return exists;
-}
-
-exports.getUser = find;
+const { getUser } = require('../services/AuthService');
 
 exports.register = async (req, res) => {
     const { name, email, password, mention, date } = req.body;
@@ -22,11 +14,11 @@ exports.register = async (req, res) => {
     if (!emailRegex.test(email)) throw "Este dominio de email não é suportado por nosso site!";
     if (password.length < 6) throw "A senha deve ter pelo menos 6 caracteres!";
 
-    const userExists = await find({ email });
+    const userExists = await getUser({ email }, User);
     if (userExists) throw "Um usuário com o mesmo email já existe!";
 
     const ment = "@" + mention;
-    const mentionExists = await find({ mention: ment });
+    const mentionExists = await getUser({ mention: ment }, User);
     if (mentionExists) throw "Um usuário com a mesma @ já existe";
 
     const user = new User({
@@ -59,7 +51,7 @@ exports.login = async (req, res) => {
 
     console.log(returnedObject);
 
-    const user = await find(returnedObject);
+    const user = await getUser(returnedObject, User);
     if (!user) throw "Email/@ ou senha não são compativeis com nenhum registro!";
 
     const token = jwt.sign({ id: user.id }, process.env.SECRET);

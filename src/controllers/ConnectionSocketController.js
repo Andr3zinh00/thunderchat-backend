@@ -1,10 +1,12 @@
 const mongoose = require("mongoose");
 const Connection = mongoose.model('connections');
+const User = mongoose.model('User');
 
-const { getUser } = require("./UserController");
+
+const { getUser } = require("../services/AuthService");
 
 exports.createConnection = async (socketId, userMention) => {
-  const _user = await getUser({ mention: userMention });
+  const _user = await getUser({ mention: userMention }, User);
 
   if (!userMention)
     throw "Mention não definida!";
@@ -15,30 +17,14 @@ exports.createConnection = async (socketId, userMention) => {
   await Connection.findOneAndUpdate({
     userId: _user.id
   }, {
-    socketId
+    $push: { socketId }
   }, {
     upsert: true,
     useFindAndModify: false
   });
-
-  // if (condition) {
-
-  // }
-
-  // console.log(_user);
-  // const conn = new Connection({
-  //   userId: _user.id,
-  //   socketId
-  // });
-
-  // console.log(conn);
-  // await conn.save()
-
-  // console.log(conn);
 }
 
 exports.deleteConnection = async (socketId) => {
-  const conn = await Connection.findOneAndDelete({ socketId });
-
-  console.log(conn);
+  const conn = await Connection.updateOne({ socketId }, { $pullAll: { socketId: [socketId] } });
+  await Connection.deleteOne({ socketId: { $exists: true, $size: 0 } });
 }
