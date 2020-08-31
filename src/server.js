@@ -38,6 +38,7 @@ app.use(cors());
 //setup routes
 app.use('/user', require('./routes/user'));
 app.use('/chat', require('./routes/chat'));
+app.use('/notification', require('./routes/notification'));
 
 //Error handlers
 app.use(errorHandler.mongoseErrors);
@@ -65,8 +66,11 @@ const jwt = require("jsonwebtoken");
 // });
 
 const { createConnection, deleteConnection } = require('./controllers/ConnectionSocketController');
-const { sendRequest } = require('./controllers/NotificationSocketController');
 
+
+const { getUser: getUserConn, getUser } = require('./services/AuthService');
+const Conn = mongoose.model('connections');
+const User = mongoose.model('User');
 io.on('connection', (socket) => {
     console.log('Client conectado: ' + socket.id);
 
@@ -88,13 +92,18 @@ io.on('connection', (socket) => {
     });
 
     socket.on('request', (data) => {
-        sendRequest(data.mention, socket, data.message)
+
         socket.emit('add-contact', { message: "hihihihihihihhihi" });
     });
 
-    socket.on('new_notification', (data) => {
-        console.log(data);
-        io.to(socket.id).emit({ data })
+    socket.on('send-notification', async (data) => {
+        console.log(data, 'ioasjdioajsdiojaiso');
+        const user = await getUser({ mention: data.mention }, User);
+        console.log(user);
+        if (!user) return;
+        const conn = await getUserConn({ userId: user.id }, Conn);
+        console.log("masdkjnasjdasdiljasidjiasld");
+        conn.socketId.map(id => io.to(id).emit('request-sent', { data }))
     });
 })
 

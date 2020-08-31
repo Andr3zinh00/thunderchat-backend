@@ -1,17 +1,14 @@
 const mongoose = require('mongoose');
-
-const contactList = new mongoose.Schema({
+const contactSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
-  }
-});
-
-const contactSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: 'userId is required'
   },
-  contact_list: [contactList],
+  contact_list: {
+    type: [String],
+    required:'contact_list is required'
+  },
 }, {
   timestamps: true
 });
