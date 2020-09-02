@@ -39,6 +39,7 @@ app.use(cors());
 app.use('/user', require('./routes/user'));
 app.use('/chat', require('./routes/chat'));
 app.use('/notification', require('./routes/notification'));
+app.use('/contacts', require('./routes/contact'));
 
 //Error handlers
 app.use(errorHandler.mongoseErrors);

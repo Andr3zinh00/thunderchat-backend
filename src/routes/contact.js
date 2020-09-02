@@ -4,6 +4,7 @@ const contactController = require('../controllers/ContactController');
 
 const auth = require("../middlewares/auth");
 
-router.post("/contacts/add-contact", auth, catchErrors(contactController.addContact))
+router.post("/add-contact", auth, catchErrors(contactController.addContact))
+router.get("/get-contacts/:id", auth, catchErrors(contactController.getContacts))
 
 module.exports = router;

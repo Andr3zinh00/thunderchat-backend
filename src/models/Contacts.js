@@ -6,8 +6,8 @@ const contactSchema = new mongoose.Schema({
     required: 'userId is required'
   },
   contact_list: {
-    type: [String],
-    required:'contact_list is required'
+    type: [{ contact_id: mongoose.Schema.Types.ObjectId }],
+    required: 'contact_list is required'
   },
 }, {
   timestamps: true
